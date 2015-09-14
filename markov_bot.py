@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 #
-# Example program using irc.bot.
+# Basic markov chain irc bot, written by motsu
 #
-# Joel Rosdahl <joel@rosdahl.net>
+# IRC code by Joel Rosdahl <joel@rosdahl.net>
 
 """A simple example bot.
 
@@ -10,9 +10,9 @@ This is an example bot that uses the SingleServerIRCBot class from
 irc.bot.  The bot enters a channel and listens for commands in
 private messages and channel traffic.
 
-text sent in a pm will reply with a markov chain built off that text.
+text sent in a pm will reply with a markov chain built off the most important word of that text.
 
-text in a public channel will be replied to 1/50 times with  a markov chain reply.
+text in a public channel will randomly cause a reply with a markov reply based off the most important word
 """
 
 import random
@@ -192,6 +192,7 @@ class tfidf:
             for k in query_dict:
                 if doc_dict.has_key(k):
                     score += (query_dict[k] / self.corpus_dict[k]) + (doc_dict[k] / self.corpus_dict[k])
+                    #changed this from standard tf-idf to append word score, not document score
                     sims.append([k, score])
         return sims
 
