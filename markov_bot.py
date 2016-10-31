@@ -126,11 +126,34 @@ class Markov(object):
         gen_words = []
         i = 0
         gen_words.append(w1)
+        #skip to next sentence to avoid fragmented beginnings.
+        while (not (gen_words[len(gen_words)-1].endswith("."))):
+                w1, w2 = w2, random.choice(self.cache[(w1, w2)])
+                gen_words.append(w1)
+        #now clear for the next bit.
+        del gen_words[:]
+        w1, w2 = w2, random.choice(self.cache[(w1, w2)])
+        gen_words.append(w1)
+        #now build the thing for real.
         while (not (gen_words[len(gen_words)-1].endswith("."))) or i < size:
-            w1, w2 = w2, random.choice(self.cache[(w1, w2)])
-            gen_words.append(w1)
-            i += 1
-        return ' '.join(gen_words)
+            if (w1, w2) in self.cache:
+                w1, w2 = w2, random.choice(self.cache[(w1, w2)])
+                gen_words.append(w1)
+                i += 1
+            else:
+                print "shit..."
+                possible_next_word = []
+                for i in xrange(len(self.words)):
+                    if unicode(w1.lower()) == unicode(self.words[i].lower()):
+                        possible_next_word.append(i)
+                w2 = self.words[random.choice(possible_next_word)+1]
+                gen_words.append(w1)
+                i += 1
+        
+        if(sum(len(letters) for letters in gen_words) < 300):
+            return ' '.join(gen_words)
+        else:
+            return self.generate_markov_text()
     
     def generate_markov_text_with_seed(self, seed, size=10):
         #get list of seed index's
@@ -145,10 +168,27 @@ class Markov(object):
         i = 0
         gen_words.append(w1)
         while (not (gen_words[len(gen_words)-1].endswith("."))) or i < size:
-            w1, w2 = w2, random.choice(self.cache[(w1, w2)])
-            gen_words.append(w1)
-            i += 1
-        return ' '.join(gen_words)
+            if (w1, w2) in self.cache:
+                w1, w2 = w2, random.choice(self.cache[(w1, w2)])
+                gen_words.append(w1)
+                i += 1
+            else:
+                print "shit..."
+                possible_next_word = []
+                for i in xrange(len(self.words)):
+                    if unicode(w1.lower()) == unicode(self.words[i].lower()):
+                        possible_next_word.append(i)
+                w2 = self.words[random.choice(possible_next_word)+1]
+                gen_words.append(w1)
+                i += 1
+
+        if(sum(len(letters) for letters in gen_words) < 300):
+            return ' '.join(gen_words)
+        else:
+            return self.generate_markov_text_with_seed(seed)
+
+
+
 
 class tfidf:
     def __init__(self):
